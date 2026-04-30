@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Placement Predictor - ML Naïve Bayes Model</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-brain"></i>
+                    <h1>Job Placement Predictor</h1>
+                </div>
+                <p class="subtitle">Powered by Machine Learning (Naïve Bayes Algorithm)</p>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="content-wrapper">
+                <!-- Info Section -->
+                <section class="info-section">
+                    <div class="info-card">
+                        <h2>How It Works</h2>
+                        <p>This application uses a <strong>Naïve Bayes</strong> machine learning algorithm trained on real company hiring data to predict your job placement probability.</p>
+                        <ul class="features-list">
+                            <li><i class="fas fa-check-circle"></i> Analyzes CGPA and academic performance</li>
+                            <li><i class="fas fa-check-circle"></i> Evaluates technical skills match</li>
+                            <li><i class="fas fa-check-circle"></i> Considers industry certifications</li>
+                            <li><i class="fas fa-check-circle"></i> Factors in project experience</li>
+                            <li><i class="fas fa-check-circle"></i> Assesses soft skills and communication</li>
+                            <li><i class="fas fa-check-circle"></i> Provides personalized recommendations</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <!-- Form Section -->
+                <section class="form-section">
+                    <div class="form-container">
+                        <h2>Your Profile</h2>
+                        <form id="predictionForm" class="prediction-form">
+                            <!-- Row 1: CGPA and Communication -->
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="cgpa">
+                                        <i class="fas fa-graduation-cap"></i> CGPA (0-10)
+                                        <span class="required">*</span>
+                                    </label>
+                                    <input type="number" id="cgpa" name="cgpa" 
+                                           min="0" max="10" step="0.01" 
+                                           placeholder="8.5" required>
+                                    <small class="range-hint">Current GPA on 10-point scale</small>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="communication">
+                                        <i class="fas fa-users"></i> Communication Level (1-5)
+                                        <span class="required">*</span>
+                                    </label>
+                                    <input type="number" id="communication" name="communication_level" 
+                                           min="1" max="5" step="1" 
+                                           placeholder="4" required>
+                                    <small class="range-hint">1=Needs improvement, 5=Excellent</small>
+                                </div>
+                            </div>
+
+                            <!-- Row 2: Projects and Internships -->
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="projects">
+                                        <i class="fas fa-project-diagram"></i> Projects Completed
+                                        <span class="required">*</span>
+                                    </label>
+                                    <input type="number" id="projects" name="projects" 
+                                           min="0" step="1" 
+                                           placeholder="3" required>
+                                    <small class="range-hint">Number of real-world projects</small>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="internships">
+                                        <i class="fas fa-briefcase"></i> Internships
+                                        <span class="required">*</span>
+                                    </label>
+                                    <input type="number" id="internships" name="internships" 
+                                           min="0" step="1" 
+                                           placeholder="1" required>
+                                    <small class="range-hint">Number of internships</small>
+                                </div>
+                            </div>
+
+                            <!-- Row 3: Domain -->
+                            <div class="form-row">
+                                <div class="form-group full-width">
+                                    <label for="domain">
+                                        <i class="fas fa-compass"></i> Domain of Interest
+                                        <span class="required">*</span>
+                                    </label>
+                                    <select id="domain" name="domain" required>
+                                        <option value="">Select your domain...</option>
+                                        <option value="Web Development">Web Development</option>
+                                        <option value="Mobile Development">Mobile Development</option>
+                                        <option value="Data Science">Data Science</option>
+                                        <option value="Machine Learning">Machine Learning</option>
+                                        <option value="Cloud Computing">Cloud Computing</option>
+                                        <option value="DevOps">DevOps</option>
+                                        <option value="Cybersecurity">Cybersecurity</option>
+                                        <option value="Database Administration">Database Administration</option>
+                                        <option value="Software Development">Software Development</option>
+                                        <option value="AI/NLP">AI/NLP</option>
+                                        <option value="Full Stack Development">Full Stack Development</option>
+                                        <option value="Embedded Systems">Embedded Systems</option>
+                                        <option value="Game Development">Game Development</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Row 4: Skills -->
+                            <div class="form-row">
+                                <div class="form-group full-width">
+                                    <label for="skills">
+                                        <i class="fas fa-code"></i> Technical Skills
+                                        <span class="required">*</span>
+                                    </label>
+                                    <div id="skillsContainer" class="multi-select-container">
+                                        <input type="text" id="skillsInput" class="multi-select-input" 
+                                               placeholder="Type to search skills...">
+                                        <div id="skillsSuggestions" class="suggestions"></div>
+                                        <div id="skillsTags" class="tags-container"></div>
+                                    </div>
+                                    <small class="range-hint">Select multiple skills relevant to your domain</small>
+                                </div>
+                            </div>
+
+                            <!-- Row 5: Certifications -->
+                            <div class="form-row">
+                                <div class="form-group full-width">
+                                    <label for="certifications">
+                                        <i class="fas fa-certificate"></i> Certifications
+                                        <span class="required">*</span>
+                                    </label>
+                                    <div id="certContainer" class="multi-select-container">
+                                        <input type="text" id="certInput" class="multi-select-input" 
+                                               placeholder="Type to search certifications...">
+                                        <div id="certSuggestions" class="suggestions"></div>
+                                        <div id="certTags" class="tags-container"></div>
+                                    </div>
+                                    <small class="range-hint">Add professional certifications (AWS, Azure, etc.)</small>
+                                </div>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <div class="form-row">
+                                <button type="submit" class="btn-submit">
+                                    <i class="fas fa-magic"></i> Predict My Placement
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+
+                <!-- Results Section -->
+                <section id="resultsSection" class="results-section" style="display: none;">
+                    <div class="results-container">
+                        <h2>Your Prediction Results</h2>
+                        
+                        <!-- Probability Card -->
+                        <div class="result-card probability-card">
+                            <div class="probability-circle">
+                                <svg class="progress-ring" width="200" height="200">
+                                    <circle class="progress-ring-circle" stroke="#e0e0e0" fill="transparent" r="95" cx="100" cy="100" stroke-width="8"/>
+                                    <circle id="progressRing" class="progress-ring-circle" stroke="#4CAF50" fill="transparent" r="95" cx="100" cy="100" stroke-width="8" stroke-dasharray="596.5" stroke-dashoffset="596.5"/>
+                                </svg>
+                                <div class="probability-value">
+                                    <span id="probabilityPercentage">0%</span>
+                                </div>
+                            </div>
+                            <div class="probability-details">
+                                <h3 id="placementStatus">Calculating...</h3>
+                                <p id="confidenceScore">Confidence: --</p>
+                            </div>
+                        </div>
+
+                        <!-- Recommendation Card -->
+                        <div class="result-card recommendation-card">
+                            <h3><i class="fas fa-lightbulb"></i> Recommendations</h3>
+                            <p id="recommendationText">Loading recommendations...</p>
+                        </div>
+
+                        <!-- Stats Cards -->
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-icon"><i class="fas fa-graduation-cap"></i></div>
+                                <div class="stat-content">
+                                    <h4>CGPA</h4>
+                                    <p id="statCGPA">--</p>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon"><i class="fas fa-code"></i></div>
+                                <div class="stat-content">
+                                    <h4>Skills</h4>
+                                    <p id="statSkills">--</p>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon"><i class="fas fa-project-diagram"></i></div>
+                                <div class="stat-content">
+                                    <h4>Projects</h4>
+                                    <p id="statProjects">--</p>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon"><i class="fas fa-briefcase"></i></div>
+                                <div class="stat-content">
+                                    <h4>Internships</h4>
+                                    <p id="statInternships">--</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- New Prediction Button -->
+                        <div class="form-row">
+                            <button type="button" class="btn-secondary" onclick="location.reload()">
+                                <i class="fas fa-redo"></i> Make Another Prediction
+                            </button>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>&copy; 2026 Job Placement Predictor. Built with <i class="fas fa-heart"></i> using Machine Learning.</p>
+            <p>Naïve Bayes Algorithm | Powered by scikit-learn</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
